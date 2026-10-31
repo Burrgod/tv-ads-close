@@ -1,0 +1,47 @@
+{
+  "schema_version": 2,
+  "id": "xiaomi-example-model",
+  "brand": "xiaomi",
+  "model": "MiTV-XXXX",
+  "device": "codename",
+  "android": 9,
+  "sdk": 28,
+  "firmware": ["0.0.0.0"],
+  "status": "draft",
+  "source": "REPLACE: issue/PR/self-test",
+  "setup": [
+    "REPLACE: 该机型的 ADB 入口路径"
+  ],
+  "settings": {},
+  "disable": [
+    {
+      "package": "com.miui.analytics",
+      "reason": "REPLACE: 为什么停用",
+      "risk": "low",
+      "evidence": {
+        "level": "E0",
+        "method": "REPLACE: 怎么验证（单变量 + 重启 A/B）",
+        "before": "REPLACE",
+        "after": "REPLACE",
+        "date": "2026-10-31"
+      }
+    }
+  ],
+  "never_disable": [
+    "com.mitv.tvhome",
+    "com.xiaomi.mitv.settings",
+    "com.xiaomi.mitv.tvplayer",
+    "com.xiaomi.mitv.tvmanager",
+    "com.xiaomi.voicecontrol",
+    "com.xiaomi.miplay",
+    "com.sohu.inputmethod.sogou.tv",
+    "com.xiaomi.account",
+    "com.xiaomi.mitv.appstore",
+    "com.xiaomi.mitv.upgrade",
+    "com.android.systemui",
+    "com.android.settings"
+  ],
+  "notes": [
+    "REPLACE: 授权弹窗/ADB 复位/OTA/副作用"
+  ]
+}

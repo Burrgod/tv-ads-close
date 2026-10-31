@@ -1,0 +1,71 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Unit + integration tests
+        run: python -m unittest discover -s tests -v
+      - name: CLI smoke (demo, no device)
+        run: python scripts/tv_ads_close.py demo
+      - name: Profile validation (schema v2 + allowlist + evidence)
+        run: |
+          PYTHONPATH=scripts python - <<'PY'
+          import tv_ads_close as t
+          profiles = t.load_profiles()
+          for profile in profiles:
+              t.validate_profile(profile)
+          print(f"{len(profiles)} profile(s) valid")
+          PY
+      - name: Privacy scan
+        run: |
+          # IP examples (192.168.1.23) are intentional; real MAC must not be committed.
+          if grep -rEn '([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}' \
+            README.md SKILL.md DISCLAIMER.md SECURITY.md CONTRIBUTING.md docs profiles; then
+            echo "possible MAC address found"
+            exit 1
+          fi
+      - name: Link check
+        run: |
+          python - <<'PY'
+          import pathlib, re, sys
+          bad = []
+          for path in pathlib.Path(".").rglob("*.md"):
+              if ".git" in path.parts:
+                  continue
+              text = path.read_text(encoding="utf-8")
+              for target in re.findall(r"\]\(([^)]+)\)", text):
+                  if target.startswith(("http://", "https://", "#", "mailto:")):
+                      continue
+                  clean = target.split("#")[0]
+                  if clean and not (path.parent / clean).exists():
+                      bad.append(f"{path}: {target}")
+          if bad:
+              print("\n".join(bad))
+              sys.exit(1)
+          print("links ok")
+          PY
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Unit + integration tests
+        run: python -m unittest discover -s tests -v
+      - name: CLI smoke (demo, no device)
+        run: python scripts/tv_ads_close.py demo

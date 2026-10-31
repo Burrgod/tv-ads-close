@@ -1,0 +1,27 @@
+---
+description: Use tv-ads-close safely (Xiaomi/Redmi TV system ads, plan-first, allowlist, restore)
+globs:
+alwaysApply: false
+---
+
+# tv-ads-close — Cursor 规则
+
+只在用户明确要求、且电视是用户本人（或所有人在场同意）时使用。
+
+## 必须
+
+1. 先说明：只处理系统广告；首页推荐流、App 内广告去不掉；当前 profile 是单机观察（E1），不是全面验证。
+2. 运行 `python3 scripts/tv_ads_close.py doctor` 和 `probe --host <TV_IP>`。
+3. 运行 `plan --host <TV_IP> --include-observed --attest-owner --save plan.json`，把动作、证据、风险、未覆盖、回滚命令和 8 位确认码展示给用户。
+4. 用户明确确认后，才运行 `apply --plan plan.json --confirm <码> --attest-owner`。
+5. 失败不要重启电视；按 CLI 提示 `restore`；最后提醒用户关闭 ADB 调试。
+
+## 禁止
+
+- 手写 `adb shell` 的写命令（settings put/delete、pm disable-user/enable）。
+- `root`、`pm uninstall`、`pm clear`、`fastboot`、刷机、装 APK。
+- 对非本人设备、租赁/酒店设备、远程代操作使用。
+- 未经用户明确同意加 `--include-risky`，或把 `observed` 说成 `verified`。
+- 上传 IP/MAC/序列号/账号/截图。
+
+本规则需配合已 clone 的仓库/CLI 使用；命令都在仓库根目录执行。完整规则见仓库根的 `SKILL.md`。

@@ -1,0 +1,59 @@
+name: Device report
+description: Report a tested Xiaomi/Redmi TV model, or a model that did not work.
+title: "[Device] <brand> <model> / <firmware>"
+labels: ["device-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please remove serial numbers, MAC addresses, IP addresses, and account names before posting.
+        Do NOT paste full `pm list packages` output. A filtered list is enough.
+        Evidence rules: one action at a time, reboot, observe, restore. "It worked" without A/B is E1, not verified.
+  - type: input
+    id: brand
+    attributes: { label: Brand, placeholder: Xiaomi / Redmi }
+    validations: { required: true }
+  - type: input
+    id: model
+    attributes: { label: Model, placeholder: MiTV-MFZP0 }
+    validations: { required: true }
+  - type: input
+    id: device
+    attributes: { label: Device codename, placeholder: walle }
+  - type: input
+    id: firmware
+    attributes: { label: Firmware / build, placeholder: 25.5.22.2496 }
+    validations: { required: true }
+  - type: dropdown
+    id: adb
+    attributes:
+      label: ADB status
+      options:
+        - works
+        - unauthorized
+        - no authorization dialog
+        - no ADB entry
+        - other
+  - type: textarea
+    id: steps
+    attributes:
+      label: Single-variable evidence
+      description: Which single action did you change, what did you observe before/after reboot, and how did you restore?
+    validations: { required: true }
+  - type: textarea
+    id: side_effects
+    attributes:
+      label: Side effects checked
+      description: Home / Settings / input source / voice / casting / Bluetooth / keyboard / app store / OTA.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logcat lines (remove personal info)
+      render: text
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy
+      options:
+        - label: I removed IP / MAC / serial / account / personal screenshots.
+          required: true

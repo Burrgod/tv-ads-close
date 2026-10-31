@@ -1,0 +1,160 @@
+{
+  "schema_version": 2,
+  "id": "xiaomi-mitv-mfzp0",
+  "brand": "xiaomi",
+  "model": "MiTV-MFZP0",
+  "device": "walle",
+  "android": 9,
+  "sdk": 28,
+  "firmware": ["25.5.22.2496"],
+  "status": "observed",
+  "observed_at": "2026-10-27",
+  "source": "用户自测（2026-10-27，单台设备、单次重启观察）",
+  "setup": [
+    "设置 → 关于本机 → 产品型号，连按 5 次开启开发者模式",
+    "设置 → 账号与安全 → ADB 调试 → 打开",
+    "若首次连接不弹授权框：重启电视、重开 ADB、保持亮屏后再连"
+  ],
+  "settings": {
+    "global": {
+      "mitv.settings.advertise.state": {
+        "value": "1",
+        "reason": "小米广告开关（语义未做单变量验证）",
+        "risk": "low",
+        "evidence": {
+          "level": "E1",
+          "method": "2026-10-27 真机执行后重启一次观察；与 boot_ad 同时修改，未隔离变量",
+          "before": "未设置（null）",
+          "after": "1（重启后开机广告未播放，无法单独归因）",
+          "date": "2026-10-27"
+        }
+      }
+    }
+  },
+  "disable": [
+    {
+      "package": "com.miui.analytics",
+      "reason": "系统统计",
+      "risk": "low",
+      "evidence": {
+        "level": "E1",
+        "method": "2026-10-27 执行 pm disable-user；未做逐包对照，短时功能检查正常",
+        "before": "启用",
+        "after": "停用（未单独验证副作用）",
+        "date": "2026-10-27"
+      }
+    },
+    {
+      "package": "com.miui.tv.analytics",
+      "reason": "电视使用统计",
+      "risk": "low",
+      "evidence": {
+        "level": "E1",
+        "method": "2026-10-27 执行 pm disable-user；未做逐包对照",
+        "before": "启用",
+        "after": "停用（未单独验证副作用）",
+        "date": "2026-10-27"
+      }
+    },
+    {
+      "package": "com.xiaomi.statistic",
+      "reason": "埋点统计",
+      "risk": "low",
+      "evidence": {
+        "level": "E1",
+        "method": "2026-10-27 执行 pm disable-user；未做逐包对照",
+        "before": "启用",
+        "after": "停用（未单独验证副作用）",
+        "date": "2026-10-27"
+      }
+    },
+    {
+      "package": "com.xiaomi.tvqs",
+      "reason": "质量/性能上报",
+      "risk": "low",
+      "evidence": {
+        "level": "E1",
+        "method": "2026-10-27 执行 pm disable-user；未做逐包对照",
+        "before": "启用",
+        "after": "停用（未单独验证副作用）",
+        "date": "2026-10-27"
+      }
+    },
+    {
+      "package": "com.xiaomi.mitv.tvpush.tvpushservice",
+      "reason": "推送服务（停用后可能收不到系统推送）",
+      "risk": "medium",
+      "opt_in": true,
+      "evidence": {
+        "level": "E1",
+        "method": "2026-10-27 执行 pm disable-user；未单独验证推送/消息影响",
+        "before": "启用",
+        "after": "停用（副作用未验证）",
+        "date": "2026-10-27"
+      }
+    },
+    {
+      "package": "com.mitv.shoplugin",
+      "reason": "电视淘宝/商城插件",
+      "risk": "low",
+      "evidence": {
+        "level": "E1",
+        "method": "2026-10-27 执行 pm disable-user；未做逐包对照",
+        "before": "启用",
+        "after": "停用（未单独验证副作用）",
+        "date": "2026-10-27"
+      }
+    },
+    {
+      "package": "com.mitv.cloudcontrol",
+      "reason": "云端配置下发（停用后云配置可能不更新）",
+      "risk": "medium",
+      "opt_in": true,
+      "evidence": {
+        "level": "E1",
+        "method": "2026-10-27 执行 pm disable-user；未单独验证云配置影响",
+        "before": "启用",
+        "after": "停用（副作用未验证）",
+        "date": "2026-10-27"
+      }
+    },
+    {
+      "package": "com.duokan.videodaily",
+      "reason": "今日头屏/短视频推广",
+      "risk": "low",
+      "evidence": {
+        "level": "E1",
+        "method": "2026-10-27 执行 pm disable-user；未做逐包对照",
+        "before": "启用",
+        "after": "停用（未单独验证副作用）",
+        "date": "2026-10-27"
+      }
+    }
+  ],
+  "never_disable": [
+    "com.mitv.tvhome",
+    "com.xiaomi.mitv.settings",
+    "com.xiaomi.mitv.tvplayer",
+    "com.xiaomi.mitv.tvmanager",
+    "com.xiaomi.voicecontrol",
+    "com.xiaomi.miplay",
+    "com.xiaomi.mitv.smartshare",
+    "com.sohu.inputmethod.sogou.tv",
+    "com.xiaomi.account",
+    "com.xiaomi.mitv.appstore",
+    "com.xiaomi.mitv.upgrade",
+    "com.android.systemui",
+    "com.android.settings",
+    "com.android.bluetooth",
+    "com.android.packageinstaller"
+  ],
+  "notes": [
+    "本机型没有“开发者选项 / USB 调试 / 授权管理”，只有“账号与安全 → ADB 调试”。",
+    "首次连接可能不弹授权框；重启电视、重开 ADB、保持亮屏后再连。",
+    "重启后 ADB 开关可能复位，需要重新打开。",
+    "com.mitv.care 系统里默认已禁用，不要手动改动。",
+    "boot_ad 原值已经是 0，本次写入是 no-op；boot_ad_switch_show 没有实测依据，已从 profile 移除。",
+    "首页 PatchWall 推荐位属于桌面内容，本 profile 不处理；App 内广告不在范围内。",
+    "所有动作均为 E1（单机观察），未做单变量对照；默认 plan 会被拒绝（无动作，退出码 2），需显式 --include-observed。"
+  ]
+}
