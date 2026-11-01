@@ -27,7 +27,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-VERSION = "0.2.2"
+VERSION = "0.2.3"
 PROFILE_SCHEMA_VERSION = 2
 PLAN_VERSION = 1
 BACKUP_VERSION = 2

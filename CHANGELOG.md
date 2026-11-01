@@ -3,6 +3,12 @@
 All notable changes to this project are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/); versioning: SemVer.
 
+## [0.2.3] - 2026-11-01
+
+### Fixed
+
+- CI: pin Ubuntu runner to 22.04 so Python 3.9 is available (`ubuntu-latest` moved to 26.04). No functional change.
+
 ## [0.2.2] - 2026-11-01
 
 ### Added

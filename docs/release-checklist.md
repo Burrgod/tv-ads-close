@@ -6,7 +6,7 @@
 
 - [ ] 仓库 `Burrgod/tv-ads-close` 已创建（或改 URL）；README 安装命令地址正确
 - [ ] Description / topics 已填；License 被 GitHub 识别为 MIT
-- [ ] 独立 git 仓库：首次 commit、`v0.2.2` tag、Release 附 SHA256
+- [ ] 独立 git 仓库：首次 commit、`v0.2.3` tag、Release 附 SHA256
 - [ ] CI 全绿（3.9/3.11/3.12 + macOS；单测、demo、profile 校验、链接、MAC 隐私扫描）
 - [ ] `git status` 干净；无 `__pycache__`、无本地计划/备份文件
 
