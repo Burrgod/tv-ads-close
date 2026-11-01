@@ -73,8 +73,6 @@ bash scripts/try-in-sandbox.sh
 
 ## 安装
 
-> 仓库地址为 `Burrgod/tv-ads-close`；若尚未创建，先建同名仓库（见 [docs/release-checklist.md](docs/release-checklist.md)）。
-
 ### 人类用户（不装 Skill）
 
 ```bash
