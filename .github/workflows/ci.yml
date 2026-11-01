@@ -20,6 +20,8 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: CLI smoke (demo, no device)
         run: python scripts/tv_ads_close.py demo
+      - name: Sandbox walkthrough (fake TV)
+        run: bash scripts/try-in-sandbox.sh
       - name: Profile validation (schema v2 + allowlist + evidence)
         run: |
           PYTHONPATH=scripts python - <<'PY'

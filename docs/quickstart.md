@@ -26,6 +26,14 @@ python3 scripts/tv_ads_close.py demo      # 不需要 adb，先看计划
 python3 scripts/tv_ads_close.py doctor   # 需要 adb；没有 adb 会退出 8
 ```
 
+## 没有电视：先跑沙盒
+
+```bash
+bash scripts/try-in-sandbox.sh
+```
+
+输出与真实流程一致，但设备是假的。
+
 ## 发现电视 + 等待授权
 
 ```bash

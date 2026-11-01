@@ -27,7 +27,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-VERSION = "0.2.1"
+VERSION = "0.2.2"
 PROFILE_SCHEMA_VERSION = 2
 PLAN_VERSION = 1
 BACKUP_VERSION = 2
@@ -1326,6 +1326,7 @@ def restore_from_backup(
         raise CliError(EXIT_PARTIAL, "还原未完全成功：" + "；".join(failures))
     if not quiet:
         print("\n还原完成。建议重启电视后再检查。")
+        print("注意：不要再用旧计划运行 verify；还原后它会显示“计划未生效”，这是预期的。")
 
 
 # --------------------------------------------------------------------------- #
@@ -1592,6 +1593,7 @@ def cmd_verify(args: argparse.Namespace) -> int:
     if failures or problems:
         print(f"  ❌ 未通过（{len(failures) + len(problems)} 项）")
         print("  下一步：运行 restore；最新备份在 ~/.tv-ads-close/backups/")
+        print("  如果刚刚 restore 过：这是预期结果，不要重复 apply。")
     else:
         print("  ✅ 设置与包状态符合计划。")
         print("  下一步：重启电视观察开机过程；确认没广告才算真正成功。")

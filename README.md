@@ -63,6 +63,14 @@
 5. **可证伪验证**：`verify` 检查设置、包状态、核心包和日志；**不把单条 `getprop` 当作成功证据**，最终以重启观察为准。
 6. **无遥测**：不联网、不上传设备信息；备份与签名密钥只在本机 `~/.tv-ads-close/`。
 
+## 没有电视？先跑沙盒
+
+```bash
+bash scripts/try-in-sandbox.sh
+```
+
+用假电视走完 `demo → setup → plan → apply → verify → restore`，**不连接任何真实设备、不写真实电视**。想看临时备份/计划可加 `KEEP=1`。
+
 ## 安装
 
 > 仓库地址为 `Burrgod/tv-ads-close`；若尚未创建，先建同名仓库（见 [docs/release-checklist.md](docs/release-checklist.md)）。

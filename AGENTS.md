@@ -38,5 +38,6 @@ python3 scripts/tv_ads_close.py demo
 - `scripts/tv_ads_close.py` — CLI（唯一写入路径）
 - `profiles/` — 机型配置（schema v2，带 evidence）
 - `tests/` — 单测 + fake adb 集成测试
+- `scripts/try-in-sandbox.sh` — 无电视体验脚本（假设备）
 - `docs/` — quickstart / troubleshooting / compatibility / legal / design
 - `README.md` — 人看的首页（状态、限制、安装）

@@ -3,6 +3,18 @@
 All notable changes to this project are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/); versioning: SemVer.
 
+## [0.2.2] - 2026-11-01
+
+### Added
+
+- `scripts/try-in-sandbox.sh`: one-command walkthrough with a fake TV (no real device/network).
+- `KEEP=1` keeps the sandbox state for inspection.
+
+### Fixed
+
+- `restore` and `verify` now explain that verify failing after a restore is expected (the plan is no longer applied).
+- Tests: 58.
+
 ## [0.2.1] - 2026-11-01
 
 ### Added

@@ -262,6 +262,19 @@ class FlowTests(unittest.TestCase):
         self.assertEqual(code, 0, msg=out + err)
         self.assertEqual(self.fake_state()["disabled"], ["com.mitv.care"])
 
+    def test_verify_after_restore_explains_expected_failure(self) -> None:
+        plan_path, _ = self.make_plan()
+        code, out, err = self.apply(plan_path)
+        self.assertEqual(code, 0, msg=out + err)
+        backup = self.latest_backup()
+        code, out, err = self.run_cli(
+            ["restore", "--host", "127.0.0.1", "--backup", str(backup), "--attest-owner"]
+        )
+        self.assertEqual(code, 0, msg=out + err)
+        code, out, err = self.run_cli(["verify", "--plan", str(plan_path)])
+        self.assertEqual(code, 6, msg=out + err)
+        self.assertIn("预期", out)
+
     def test_restore_dry_run_then_real(self) -> None:
         self.disable_all()
         backup = self.latest_backup()
