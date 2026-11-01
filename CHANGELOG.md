@@ -3,6 +3,19 @@
 All notable changes to this project are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/); versioning: SemVer.
 
+## [0.2.1] - 2026-11-01
+
+### Added
+
+- `setup`: mDNS discovery, wait-for-authorization polling, profile match, next-step hint (no device writes).
+- Human/machine division in README: user does only TV-side ADB + allow + reboot observation; CLI does the rest.
+- `verify` now prints a human-readable conclusion (pass/fail + next action).
+- Tests: 57 (setup/mDNS/verify conclusion).
+
+### Changed
+
+- Docs: quickstart/SKILL/AGENTS now start with `setup`; `--host` remains the fallback.
+
 ## [0.2.0] - 2026-10-31
 
 ### Changed — breaking

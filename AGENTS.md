@@ -9,7 +9,7 @@
 
 ## 给使用本 Skill 的 Agent
 
-1. 先读 `SKILL.md`，按流程 `doctor → probe → plan → 展示计划 → 用户确认 → apply → verify`。
+1. 先读 `SKILL.md`，按流程 `setup → plan → 展示计划 → 用户确认 → apply → verify`。
 2. **写入只能通过 CLI**；不要手写 `adb shell` 的 `settings put/delete`、`pm disable-user/enable`。
 3. 当前 profile 是 `observed (E1)`，不是「已验证」；必须在对话里说明。
 4. `apply` 必须带 `--plan`、`--confirm <plan 输出的 8 位码>`、`--attest-owner`。

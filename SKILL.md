@@ -76,10 +76,17 @@ Say briefly:
 
 If the user still wants to proceed, continue.
 
-### 1. Preflight
+### 1. Preflight / setup
 
 ```bash
-python3 scripts/tv_ads_close.py doctor
+python3 scripts/tv_ads_close.py setup
+```
+
+This discovers the TV over mDNS, waits for the user to tap "allow" on the TV, and prints the matched profile. If discovery fails, ask the user for the IP: `setup --host <TV_IP>`.
+
+Then (optional read-only check):
+
+```bash
 python3 scripts/tv_ads_close.py probe --host <TV_IP>
 ```
 

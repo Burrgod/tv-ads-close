@@ -41,6 +41,13 @@
 - profile 只能引用表内项；新增要改代码 + 测试；
 - 核心包（桌面/设置/信号源/电视管家/语音/投屏/输入法/账号/商店/OTA/SystemUI/PackageInstaller）永远拒绝。
 
+### 2.5 发现与 setup
+
+- `setup` 用 mDNS（`adb mdns services`）找电视，不扫网段；失败时让用户给 IP；
+- 轮询等待电视授权，不要求用户手动 `adb connect`；
+- 连上后只读探测、匹配 profile，并打印下一步 `plan` 命令；
+- 仍然不做任何写入。
+
 ### 3. 设备身份
 
 - `ro.serialno` 哈希（不存明文）+ 尾号展示；

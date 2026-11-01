@@ -27,7 +27,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-VERSION = "0.2.0"
+VERSION = "0.2.1"
 PROFILE_SCHEMA_VERSION = 2
 PLAN_VERSION = 1
 BACKUP_VERSION = 2
@@ -236,6 +236,33 @@ def connect(host: str) -> None:
         EXIT_UNAUTHORIZED,
         f"未找到可调试设备（{host}）：{last_error}。确认电视与电脑同一局域网、ADB 已打开。",
     )
+
+
+def discover_mdns() -> list[dict[str, str]]:
+    """Find TVs advertised over adb mDNS. Read-only; no subnet scanning."""
+    proc = run_adb(["mdns", "services"], timeout=10)
+    if proc.returncode != 0:
+        return []
+    found: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for line in (proc.stdout or "").splitlines():
+        parts = line.split("\t")
+        if len(parts) < 2:
+            continue
+        serial = parts[0].strip()
+        service = parts[1].strip()
+        if "_adb" not in service:
+            continue
+        host = ""
+        for part in parts[2:]:
+            candidate = part.strip()
+            if re.match(r"^[0-9a-fA-F:.]+:\d+$", candidate):
+                host = candidate
+                break
+        if host and host not in seen:
+            seen.add(host)
+            found.append({"serial": serial, "service": service, "host": host})
+    return found
 
 
 def shell(host: str, command: str, timeout: int = DEFAULT_TIMEOUT) -> str:
@@ -1391,6 +1418,81 @@ def cmd_demo(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def cmd_setup(args: argparse.Namespace) -> int:
+    proc = run_adb(["version"], timeout=10)
+    if proc.returncode != 0:
+        raise CliError(EXIT_ENV, "adb 不可用。macOS 可执行：brew install android-platform-tools")
+    print("你只需要做 3 件事：")
+    print("  1) 电视：设置 → 账号与安全 → ADB 调试 → 打开")
+    print("  2) 电视弹窗：允许 USB 调试（勾“一律允许”）")
+    print("  3) 最后重启电视，看一眼开机过程")
+    print("其余探测、连接、检查由 Agent/CLI 完成。\n")
+
+    host = normalize_host(args.host) if args.host else None
+    if host is None:
+        services = discover_mdns()
+        if len(services) == 1:
+            host = services[0]["host"]
+            print(f"mDNS 发现设备：{host}")
+        elif len(services) > 1:
+            for index, item in enumerate(services, start=1):
+                print(f"  {index}) {item['host']}  {item['serial']}")
+            if args.non_interactive:
+                raise CliError(EXIT_USAGE, "发现多台设备；请用 --host <IP> 指定。")
+            choice = input("选择编号：").strip()
+            try:
+                host = services[int(choice) - 1]["host"]
+            except (ValueError, IndexError) as exc:
+                raise CliError(EXIT_USAGE, "编号无效。") from exc
+        else:
+            if args.non_interactive:
+                raise CliError(
+                    EXIT_USAGE,
+                    "没有发现可调试电视。请确认电视已开 ADB、与电脑同一网络，或用 --host <IP> 指定。",
+                )
+            raw = input("没发现电视。请输入电视 IP（设置 → 网络）：").strip()
+            host = normalize_host(raw)
+
+    print("电视端：保持亮屏；如果弹出授权框，请遥控器选择“一律允许”。")
+    deadline = time.time() + max(0, args.timeout)
+    attempt = 0
+    while True:
+        attempt += 1
+        try:
+            connect(host)
+            break
+        except CliError as exc:
+            if exc.code != EXIT_UNAUTHORIZED:
+                raise
+            if time.time() >= deadline:
+                raise CliError(
+                    EXIT_UNAUTHORIZED,
+                    f"等待电视授权超时（{args.timeout}s）。请在电视上点允许，或重启电视后重开 ADB。",
+                )
+            remaining = max(1, int(deadline - time.time()))
+            print(f"[{attempt}] 等待电视上线/授权（剩余 {remaining}s）……")
+            time.sleep(min(5, remaining))
+
+    info = probe(host)
+    print(f"\n已连接：{info['brand']} {info['model']} / Android {info['android']} / {info['build']}")
+    print(f"序列号：***{info['serial_tail']}    地址：{mask_host(host)}")
+    try:
+        profile = match_profile(load_profiles(), info)
+        print(f"匹配 profile：{profile['id']}（状态：{profile['status']}）")
+    except CliError as exc:
+        print(f"警告：{exc.message}")
+        print("下一步：按 CONTRIBUTING.md 提交机型报告；不要直接执行。")
+        return exc.code
+    print("\n下一步（只读预演；确认后再 apply）：")
+    print(
+        f"  python3 scripts/tv_ads_close.py plan --host {shlex.quote(host)} "
+        "--include-observed --attest-owner --save ./plan.json"
+    )
+    if profile["status"] == "observed":
+        print("注意：该 profile 是单机观察级（E1），不是已验证；plan 会列出证据与风险。")
+    return EXIT_OK
+
+
 def cmd_doctor(args: argparse.Namespace) -> int:
     print(f"Python：{sys.version.split()[0]}")
     print(f"平台：{sys.platform}")
@@ -1486,6 +1588,13 @@ def cmd_verify(args: argparse.Namespace) -> int:
     failures = verify_actions(host, info, plan["actions"])
     # verify is read-only and has no "before" snapshot: any disabled core package is a red flag.
     problems = core_regression(host, set())
+    print("检查结论：")
+    if failures or problems:
+        print(f"  ❌ 未通过（{len(failures) + len(problems)} 项）")
+        print("  下一步：运行 restore；最新备份在 ~/.tv-ads-close/backups/")
+    else:
+        print("  ✅ 设置与包状态符合计划。")
+        print("  下一步：重启电视观察开机过程；确认没广告才算真正成功。")
     for failure in failures + problems:
         print(f"[FAIL] {failure}")
     print("\n设置与包状态：")
@@ -1584,6 +1693,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     demo = sub.add_parser("demo", help="show a plan with fake data (no device)")
     demo.set_defaults(func=cmd_demo)
+
+    setup_parser = sub.add_parser("setup", help="discover TV, wait for authorization, check profile")
+    setup_parser.add_argument("--host", default=None)
+    setup_parser.add_argument("--timeout", type=int, default=120)
+    setup_parser.add_argument("--non-interactive", action="store_true")
+    setup_parser.set_defaults(func=cmd_setup)
 
     doctor = sub.add_parser("doctor", help="check python/adb/backup dir/profiles")
     doctor.set_defaults(func=cmd_doctor)

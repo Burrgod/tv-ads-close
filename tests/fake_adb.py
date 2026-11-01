@@ -54,6 +54,7 @@ def defaults() -> dict:
         "build": "25.5.22.2496",
         "serial": "ABC123456789",
         "serial_boot": "",
+        "mdns_host": "127.0.0.1:5555",
         "settings": {"global:mitv.settings.advertise.state": "0"},
         "packages": CORE + EXTRA + TARGETS,
         "disabled": ["com.mitv.care"],
@@ -91,6 +92,10 @@ def main() -> int:
     if args == ["version"]:
         print("Android Debug Bridge version 1.0.41")
         print("Version 35.0.0-11583719")
+        return 0
+    if args[0] == "mdns" and len(args) >= 2 and args[1] == "services":
+        if not os.environ.get("TV_FAKE_MDNS_EMPTY"):
+            print(f"adb-{state['serial']}\t_adb._tcp\t{state.get('mdns_host', '127.0.0.1:5555')}")
         return 0
     if args[0] == "connect":
         state["host"] = args[1]

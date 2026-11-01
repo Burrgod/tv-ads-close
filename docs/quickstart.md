@@ -26,13 +26,18 @@ python3 scripts/tv_ads_close.py demo      # 不需要 adb，先看计划
 python3 scripts/tv_ads_close.py doctor   # 需要 adb；没有 adb 会退出 8
 ```
 
-## 只读探测
+## 发现电视 + 等待授权
 
 ```bash
-python3 scripts/tv_ads_close.py probe --host 192.168.1.23
+python3 scripts/tv_ads_close.py setup
 ```
 
-确认型号、固件、序列号尾号。没有精确 profile 会直接停止。
+- 自动通过 mDNS 找电视（不扫网段）；
+- 等你按电视上的「允许 USB 调试」；
+- 打印型号/固件/序列号尾号/匹配的 profile。
+- 找不到就手动指定：`setup --host 192.168.1.23`。
+
+没有精确 profile 会直接停止。
 
 ## 预演
 

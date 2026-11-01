@@ -108,6 +108,47 @@ class FlowTests(unittest.TestCase):
         path.write_text(json.dumps(raw), encoding="utf-8")
 
     # -- tests -----------------------------------------------------------
+    def test_setup_discovers_and_checks_device(self) -> None:
+        code, out, err = self.run_cli(["setup", "--timeout", "5", "--non-interactive"])
+        self.assertEqual(code, 0, msg=out + err)
+        self.assertIn("你只需要做 3 件事", out)
+        self.assertIn("已连接", out)
+        self.assertIn("xiaomi MiTV-MFZP0", out)
+
+    def test_setup_unauthorized_times_out(self) -> None:
+        code, out, err = self.run_cli(["probe", "--host", "127.0.0.1"])
+        self.assertEqual(code, 0, msg=out + err)
+        state = self.fake_state()
+        state["device_state"] = "unauthorized"
+        self.write_fake_state(state)
+        code, out, err = self.run_cli(
+            ["setup", "--host", "127.0.0.1", "--timeout", "1", "--non-interactive"]
+        )
+        self.assertEqual(code, 3, msg=out + err)
+
+    def test_setup_no_mdns_noninteractive(self) -> None:
+        os.environ["TV_FAKE_MDNS_EMPTY"] = "1"
+        try:
+            code, out, err = self.run_cli(["setup", "--timeout", "1", "--non-interactive"])
+        finally:
+            os.environ.pop("TV_FAKE_MDNS_EMPTY", None)
+        self.assertEqual(code, 2, msg=out + err)
+
+    def test_verify_prints_human_conclusion(self) -> None:
+        plan_path, _ = self.make_plan()
+        code, out, err = self.apply(plan_path)
+        self.assertEqual(code, 0, msg=out + err)
+        code, out, err = self.run_cli(["verify", "--plan", str(plan_path)])
+        self.assertEqual(code, 0, msg=out + err)
+        self.assertIn("检查结论", out)
+        self.assertIn("✅", out)
+        state = self.fake_state()
+        state["disabled"].append("com.mitv.tvhome")
+        self.write_fake_state(state)
+        code, out, err = self.run_cli(["verify", "--plan", str(plan_path)])
+        self.assertEqual(code, 6, msg=out + err)
+        self.assertIn("❌", out)
+
     def test_plan_and_apply_success(self) -> None:
         plan_path, plan = self.make_plan()
         self.assertEqual(len(plan["actions"]), 9)

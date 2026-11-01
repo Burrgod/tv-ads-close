@@ -24,6 +24,16 @@
 
 > ⚠️ **最坏情况**：可能出现黑屏、桌面异常或需要恢复出厂。出问题先按 [docs/troubleshooting.md](docs/troubleshooting.md) 回滚，不要重启或乱停包。
 
+## 你只需要做 3 件事
+
+| 你做 | Agent / CLI 做 |
+|------|----------------|
+| 1. 电视：开「ADB 调试」 | 发现电视（mDNS，不扫网段） |
+| 2. 电视弹窗：点「允许 USB 调试」 | 连接、探测、匹配机型、列出计划 |
+| 3. 重启电视，看一眼开机过程 | 备份、执行、失败回滚、verify、给回滚命令 |
+
+其余步骤（找 IP、装依赖检查、重试、读日志、生成计划）都收在 `setup` / `plan` / `apply` 里。
+
 **先去试官方通道**：小米电视开机广告可拨 **950816**（以小米官方客服口径为准），提供以太网 MAC + WiFi MAC，由厂家协助关闭。这是目前**最低风险**的路径，不依赖本项目。
 
 > 说明：广电总局《公共场所电视服务提升实施指南》只适用于**公共场所**电视，不是家用电视的授权依据；本项目也不服务公共/租赁设备。
@@ -63,7 +73,8 @@
 git clone https://github.com/Burrgod/tv-ads-close.git tv-ads-close
 cd tv-ads-close
 python3 scripts/tv_ads_close.py demo      # 不接电视，先看样例（不可执行）
-python3 scripts/tv_ads_close.py doctor    # 检查 python/adb/目录
+python3 scripts/tv_ads_close.py setup     # 发现电视、等授权、检查机型（需要 adb）
+# 或：python3 scripts/tv_ads_close.py setup --host 192.168.1.23
 ```
 
 需要：Python 3.9+、`adb`（macOS：`brew install android-platform-tools`）、电视已开 ADB。
@@ -163,7 +174,8 @@ python3 scripts/tv_ads_close.py restore \
 
 | 命令 | 写入 | 作用 |
 |------|------|------|
-| `demo` | 否 | 用假设备展示计划（不连接设备、不写文件） |
+| `demo` | 否 | 用假设备展示样例（不连接设备、不写文件、不出确认码） |
+| `setup` | 否 | mDNS 发现电视、等待授权、探测机型；不需要手输 IP |
 | `doctor` | 否（本地检查，会创建备份目录） | 检查 Python / adb / 备份目录 / profiles / 签名密钥 |
 | `probe` | 否 | 只读探测设备 |
 | `plan` | 否（只写本地计划文件） | 生成计划文件（`--include-observed` / `--include-risky` / `--attest-owner`） |
